@@ -40,6 +40,7 @@ void exec_inst() {
         case 0x11:
         case 0x21:
         case 0x31:
+            write16(inst >> 4, peek(2), peek(1));
             PC += 3;
             break;
         default:
