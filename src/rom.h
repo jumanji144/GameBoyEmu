@@ -51,13 +51,17 @@ Rom* loadRom(const char* filename) {
 
             fclose(f);
 
-            return NULL;
+            printf("Error loading rom file %s\n", filename);
+
+            exit(1);
 
         }
 
         rom->name = strdup(filename);
-    }else
+    }else {
         printf("Error loading rom file %s\n", filename);
+        exit(1);
+    }
 
     fclose(f);
 

@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
 
 typedef uint8_t u4;
 typedef uint8_t u8;
