@@ -22,6 +22,7 @@ u16 combine(u8 *reg1, u8 *reg2, u16 *value) {
     }else {
         return (u16) (*reg1 << 8) | *reg2;
     }
+    return 0;
 }
 
 u16 AF(u16 *value=NULL) { 
@@ -96,6 +97,7 @@ u16 read16(u8 reg) {
             return SP;
             break;
     }
+    return 0;
 }
 
 u8 read8(u8 reg) {
@@ -113,4 +115,5 @@ u8 read8(u8 reg) {
             return A;
             break;
     }
+    return 0;
 }

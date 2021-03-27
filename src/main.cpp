@@ -7,8 +7,8 @@ int main(int argc, char const *argv[])
 {
     if(_debug) {
     Rom* rom = (Rom*)malloc(sizeof(Rom));
-    rom->data = new u8[4] {0x21, 0xFF, 0xFE, 0x22};
-    rom->total = 4;
+    rom->data = new u8[3] {0x22, 0xFF, 0xFE};
+    rom->total = 3;
 
     execute(rom, 0);
     }else {
