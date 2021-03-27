@@ -2,11 +2,12 @@
 
 typedef struct {
     u8 data[0x2000];
-    u8 offset = 0x1000;
+    u16 offset = 0x1000;
     u8 current_bank = 0;
 }RAM;
 
 RAM* WRAM = (RAM*)malloc(sizeof(RAM));
+Rom* ROM;
 
 enum MEMORY_REGION {
     INTERUPT,
@@ -48,6 +49,7 @@ MEMORY_REGION findMemoryRegion(u16 addr) {
         default:
             return UNKNOWN;
     }
+    return UNKNOWN;
 }
 
 u8 read8Addr(u16 addr) {
@@ -55,18 +57,21 @@ u8 read8Addr(u16 addr) {
         case VRAM:
             break; // impl later
         case ROM0:
-            return current_Rom->data[addr - 0150];
+            return ROM->data[addr - 0150];
         case ROM1: // impl later
             break;
         case RAM0: // Read first 1000 bytes from 
             return WRAM->data[addr - 0xC000]; // put the value offseted into the RAM
         case RAM1:
             return WRAM->data[(addr - 0xC000) + WRAM->offset];
+        default:
+            return UNKNOWN;
     }
+    return UNKNOWN;
 }
 
 u16 read16Addr(u16 addr) {
-
+    return 0;
 }
 
 void write8Addr(u16 addr, u8 value) {
@@ -81,8 +86,8 @@ void write8Addr(u16 addr, u8 value) {
         case RAM1:
             WRAM->data[(addr - 0xC000) + WRAM->offset] = value;
     }
+    return;
 }
 
 void write16Addr(u16 addr, u16 value) {
-
 }
