@@ -1,18 +1,16 @@
 #include "include.h"
 #include "util.h"
 #include "registers.h"
+#include "memory.h"
 #include <iostream>
 
 size_t offset;
 Rom* current_Rom;
+extern Rom* current_Rom;
 bool debug = true;
 
 u8 get_inst() {
     return current_Rom->data[offset + PC];
-}
-
-u16 read16bit() {
-
 }
 
 u8 get_inst_at(u8 pointer) {
@@ -40,9 +38,15 @@ void exec_inst() {
         case 0x11:
         case 0x21:
         case 0x31:
-            write16(inst >> 4, peek(2), peek(1));
-            PC += 3;
+            write16(inst >> 4, peek(2), peek(1)); PC += 3; break;
+        case 0x02:
+        case 0x12:
+            write8Addr(read16(inst >> 4), A); PC += 1;
             break;
+        case 0x22: // LOAD A FROM MEMORY IN HL AND ++
+            write8Addr(HL(), A); L += 1; PC += 1; break;
+        case 0x23: // LOAD A FROM MEMORY IN HL AND --
+            write8Addr(HL(), A); L -= 1; PC += 1; break;
         default:
             printf("[WARN] Unknown instruction at: %d\n", PC);
             PC += 1;
@@ -60,6 +64,7 @@ void exec_inst() {
     if(debug) {
         printf("Registers:\nA: 0x%x, B: 0x%x, C: 0x%x, D: 0x%x, E: 0x%x, F: 0x%x, H: 0x%x, L: 0x%x, AF: 0x%x, BC: 0x%x, DE: 0x%x, HL: 0x%x, PC: 0x%x, SP: 0x%x\nFlag Bit:\n%s\n", A, B, C, D, E, F, H, L, AF(), BC(), DE(), HL(), PC, SP,flagbit);
     }
+    delete flagbit;
         } catch(...) {
         printf("yes");
     }
