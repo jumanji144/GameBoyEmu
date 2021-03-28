@@ -1,13 +1,33 @@
 #include "include.h"
+#include "registers.h"
 
 typedef struct {
-    u8 data[0x2000];
+    u8* data;
     u16 offset = 0x1000;
     u8 current_bank = 0;
 }RAM;
 
-RAM* WRAM = (RAM*)malloc(sizeof(RAM));
+RAM* WRAM;
 Rom* ROM;
+bool log_access = false;
+
+void initMem(Rom* rom) {
+    WRAM = (RAM*)malloc(sizeof(RAM));
+    WRAM->data = (u8*)malloc(0x2000); 
+    ROM = rom;
+}
+
+#define check(addr, offset) if(addr - offset < 0) \
+ { \
+   printf("[WARN] MEMORY_ACCESS_ERROR: %d\n", addr); \
+   return 0; \
+ } 
+
+#define checkW(addr, offset) if(addr - offset < 0) \
+ { \
+   printf("[WARN] MEMORY_ACCESS_ERROR: %d\n", addr); \
+   return; \
+ } 
 
 enum MEMORY_REGION {
     INTERUPT,
@@ -53,21 +73,26 @@ MEMORY_REGION findMemoryRegion(u16 addr) {
 }
 
 u8 read8Addr(u16 addr) {
-        switch(findMemoryRegion(addr)) {
+    if(log_access)
+    printf("[INFO] MEMORY_ACCESS: R: 0x%x (%d)\n", addr, findMemoryRegion(addr));
+    switch(findMemoryRegion(addr)) {
         case VRAM:
             break; // impl later
         case ROM0:
-            return ROM->data[addr - 0150];
+            check(addr, 0)
+            return ROM->data[max(0, addr)];
         case ROM1: // impl later
             break;
         case RAM0: // Read first 1000 bytes from 
-            return WRAM->data[addr - 0xC000]; // put the value offseted into the RAM
+            check(addr, 0xC000)
+            return WRAM->data[max(0, addr - 0xC000)]; // put the value offseted into the RAM
         case RAM1:
-            return WRAM->data[(addr - 0xC000) + WRAM->offset];
+            check(addr, 0xC000)
+            return WRAM->data[max(0, (addr - 0xC000) + WRAM->offset)];
         default:
-            return UNKNOWN;
+            return 0;
     }
-    return UNKNOWN;
+    return 0;
 }
 
 u16 read16Addr(u16 addr) {
@@ -75,6 +100,8 @@ u16 read16Addr(u16 addr) {
 }
 
 void write8Addr(u16 addr, u8 value) {
+      if(log_access)
+    printf("[INFO] MEMORY_ACCESS: W: 0x%x (%d)\n", addr, findMemoryRegion(addr));
     switch(findMemoryRegion(addr)) {
         case VRAM:
             break; // impl later
@@ -82,11 +109,30 @@ void write8Addr(u16 addr, u8 value) {
         case ROM1:
             break; // READ ONLY
         case RAM0: // Read first 1000 bytes from 
-            WRAM->data[addr - 0xC000] = value; // put the value offseted into the RAM
+            checkW(addr, 0xC000)
+            WRAM->data[max(0, addr - 0xC000)] = value; // put the value offseted into the RAM
         case RAM1:
-            WRAM->data[(addr - 0xC000) + WRAM->offset] = value;
+            WRAM->data[max(0, (addr - 0xC000) + WRAM->offset)] = value;
     }
     return;
+}
+
+void inc8M(u16 addr) {
+    u8 value = read8Addr(addr);
+    value++;
+    fN = false;
+    fZ = value == 0;
+    fH = (value & 0xf) == 0;
+    write8Addr(addr, value);
+}
+
+void dec8M(u16 addr) {
+    u8 value = read8Addr(addr);
+    value--;
+    fN = true;
+    fZ = value == 0;
+    fH = (value & 0xf) == 0xf;
+    write8Addr(addr, value);
 }
 
 void write16Addr(u16 addr, u16 value) {

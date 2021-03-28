@@ -77,6 +77,15 @@ void write8(u8 reg, u8 value) {
             H = value;
             break;
         case 3:
+            C = value;
+            break;
+        case 4:
+            E = value;
+            break;
+        case 5:
+            L = value;
+            break;
+        case 6:
             A = value;
             break;
     }
@@ -112,8 +121,133 @@ u8 read8(u8 reg) {
             return H;
             break;
         case 3:
+            return C;
+            break;
+        case 4:
+            return E;
+            break;
+        case 5:
+            return L;
+            break;
+        case 6:
             return A;
             break;
     }
     return 0;
+}
+
+void inc8(u8 reg) {
+    u8 value = read8(reg);
+    value++;
+    fN = false;
+    fZ = value == 0;
+    fH = (value & 0xf) == 0;
+    write8(reg, value);
+}
+
+void dec8(u8 reg) {
+    u8 value = read8(reg);
+    value--;
+    fN = true;
+    fZ = value == 0;
+    fH = (value & 0xf) == 0xf;
+    write8(reg, value);
+}
+
+void inc16(u8 reg) {
+    write16(reg, read16(reg) + 1);
+}
+
+void dec16(u8 reg) {
+    write16(reg, read16(reg) - 1);
+}
+
+void add16(u16 val) {
+    fN = false;
+    fC = (HL() + val) > 0xffff;
+    fH = ((HL() & 0xfff) + (val & 0xfff)) > 0xfff;
+    write16(2, (HL() + val));
+}
+
+void add(u8 val) {
+    fN = false;
+    fZ = (A + val)== 0;
+    fH = ((int)(A & 0xf) + (int)(val & 0xf)) > 0xf;
+    fC = ((int)(A) + (int)(val)) > 0xff;
+    A += val;
+}
+
+void adc(u8 val) {
+    int c = fC;
+    fN = false;
+    fZ = (A + val + c)== 0;
+    fH = ((int)(A & 0xf) + (int)(val & 0xf) + (int)c) > 0xf;
+    fC = ((int)(A) + (int)(val) +(int)(c)) > 0xff;
+    A += val + c;
+}
+/*
+- Z: Set if result is 0 (a == b)
+- N: 1
+- H: Set if no borrow from bit 4
+- C: Set if no borrow (a < b)
+*/
+void sub(u8 val) {
+    fN = true;
+    fZ = (A - val) == 0;
+    fH = ((int)(A & 0xf) - (int)(val & 0xf)) < 0;
+    fC = ((int)A - (int)val) < 0;
+    A -= val;
+}
+
+void sbc(u8 val) {
+    int c = fC;
+    fN = true;
+    fZ = (A - val - c) == 0;
+    fH = ((int)(A & 0xf) - (int)(val & 0xf) - (int)c) < 0;
+    fC = ((int)A - (int)val - (int)c) < 0;
+    A -= val - c;
+}
+
+void and(u8 val) {
+    u8 value = A & val;
+    fZ = value == 0;
+    fH = true;
+    A = value;
+}
+
+void xor(u8 val) {
+    u8 value = A ^ val;
+    fZ = value == 0;
+    A = value;
+}
+
+void or(u8 val) {
+    u8 value = A | val;
+    fZ = value == 0;
+    A = value;
+}
+
+void cp(u8 val) {
+    fN = true;
+    fZ = (A - val) == 0;
+    fH = ((int)(A & 0xf) - (int)(val & 0xf)) < 0;
+    fC = ((int)A - (int)val) < 0;
+}
+
+void rl(u8 reg, bool carry) {
+    u8 value = read8(reg);
+    u8 c = (value >> 7) & 1;
+    value = (value << 1) | carry ? c : fC;
+    if(carry)
+    fC = c;
+    write8(reg, value);
+}
+
+void rr(u8 reg, bool carry) {
+    u8 value = read8(reg);
+    u8 c = (value << 7) & 1;
+    value = (value >> 1) | carry ? c : fC;
+    if(carry)
+        fC = c;
+    write8(reg, value);
 }
