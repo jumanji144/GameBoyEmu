@@ -109,10 +109,10 @@ void exec_inst() {
         op_r_r(0x88, adc);
         op_r_r(0x90, sub);
         op_r_r(0x98, sbc);
-        op_r_r(0xA0, and);
-        op_r_r(0xA8, xor);
-        op_r_r(0xB0, or);
-        op_r_r(0xB8, cp);
+        op_r_r(0xA0, anda);
+        op_r_r(0xA8, xora);
+        op_r_r(0xB0, ora);
+        op_r_r(0xB8, cpa);
         case 0xC3: PC = read16I(); break;
         default:
             printf("[WARN] Unknown instruction at: %d\n", PC);

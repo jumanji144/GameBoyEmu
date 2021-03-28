@@ -208,26 +208,26 @@ void sbc(u8 val) {
     A -= val - c;
 }
 
-void and(u8 val) {
+void anda(u8 val) {
     u8 value = A & val;
     fZ = value == 0;
     fH = true;
     A = value;
 }
 
-void xor(u8 val) {
+void xora(u8 val) {
     u8 value = A ^ val;
     fZ = value == 0;
     A = value;
 }
 
-void or(u8 val) {
+void ora(u8 val) {
     u8 value = A | val;
     fZ = value == 0;
     A = value;
 }
 
-void cp(u8 val) {
+void cpa(u8 val) {
     fN = true;
     fZ = (A - val) == 0;
     fH = ((int)(A & 0xf) - (int)(val & 0xf)) < 0;
