@@ -7,6 +7,16 @@
             "label": "compile",
             "type": "shell",
             "command": "CALL compile.bat"
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "CALL test.bat"
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "CALL run.bat"
         }
     ]
 }

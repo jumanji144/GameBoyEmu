@@ -1,5 +1,16 @@
 {
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "rom.h": "c",
+        "include.h": "c",
+        "istream": "c",
+        "memory.h": "c",
+        "emulator.h": "c",
+        "registers.h": "c",
+        "atomic": "c",
+        "typeinfo": "c",
+        "xmemory": "c",
+        "xutility": "c",
+        "xstring": "c"
     }
 }
